@@ -25,3 +25,47 @@ body {
     )
     rgb(var(--background-start-rgb));
 }
+
+.cell{
+  display: inline-block;
+  vertical-align:top;
+  height: 80px;
+  width: 80px;
+  margin: 0;
+  padding: 0;
+  color: black;
+  border: 1px solid black;
+  background-color: white;
+  background-image: none;
+  backface-visibility: visible;
+  position: relative;
+}
+
+.cell:hover{
+  background-color: red;
+}
+
+.row{
+  display: block;
+  height: 80px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  color: black;
+  background-image: none;
+  backface-visibility: visible;
+}
+
+.stone{
+  display: inline;
+  position: absolute;
+  top: -40px;
+  left: 7px;
+  padding: 0;
+  margin: 0;
+  color: black;
+  backface-visibility: visible;
+  font-size: 100px;
+  text-align: center;
+  vertical-align: text-bottom;
+}
