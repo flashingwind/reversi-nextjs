@@ -4,23 +4,38 @@ type Direction = [number, number];
 type Coordinate = [number, number];
 type CellValue = -1 | 0 | 1; // Define CellValue type here
 type CellMatrix = CellValue[][];
+export enum CellFlag {
+  None,
+  Changed,
+  Placeable,
+  Placed,
+};
+type CellFlagMatrix = CellFlag[][];
 
 const OtheloLogic = ()=> {
   return ;
 }
 
-const directions = [
+const directions: Direction[] = [
   [-1, -1], [-1, 0], [-1, 1],
   [0, -1],           [0, 1],
   [1, -1],  [1, 0],  [1, 1]
 ];
-
-export const copyBoardProps = (boardProps: BoardPropsType): BoardPropsType => {
-  let cells2: CellMatrix = [];
-  for(const l of boardProps.cells){
-    cells2.push([...l]);
-  }
-  const flags2: CellMatrix = [
+export const initialMap = (): CellMatrix => {
+  const initialMap: CellMatrix = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, -1, 1, 0, 0, 0],
+    [0, 0, 0, 1, -1, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+  ];
+  return initialMap;
+};
+export const zeroMap = (): CellMatrix => {
+  const zeroMap: CellMatrix = [
     [0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
@@ -30,27 +45,46 @@ export const copyBoardProps = (boardProps: BoardPropsType): BoardPropsType => {
     [0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
   ];
-  // let flags2: CellMatrix = [];
-  // for(const l of boardProps.flags){
-  //   flags2.push([...l]);
-  // }
+  return zeroMap;
+};
+export const noneFlags = (): CellFlagMatrix  => {
+  const zeros:CellFlagMatrix = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+  ];
+  return zeros;
+};
+export const copyCellMatrix = (matrix: CellMatrix) => {
+  let map2: CellMatrix = [];
+  for(const l of matrix){
+    map2.push([...l]);
+  }
+  return map2;
+};
+export const copyBoardProps = (boardProps: BoardPropsType): BoardPropsType => {
   let newBoardProps: BoardPropsType = {
-    cells: cells2,
-    flags: flags2,
+    map: copyCellMatrix(boardProps.map),
+    flags:  noneFlags(),
     player: boardProps.player,
   };
   return newBoardProps;
 };
-export const processCells = (boardProps: BoardPropsType, row: number, col: number, shortcutEval: boolean=false): [boolean, BoardPropsType] => {
+export const placeAndReverse = (boardProps: BoardPropsType, row: number, col: number, shortcutEval: boolean = false): [boolean, BoardPropsType] => {
 
   let isValid = false;
   const player = boardProps.player;
-  const cells: CellMatrix = boardProps.cells;
+  const map: CellMatrix = boardProps.map;
 
   const newBoardProps = copyBoardProps(boardProps);
-  if (cells[row][col] !== 0) {
+  if (map[row][col] !== 0) {
     // Cell is not empty
-    console.log("Cell is not empty");
+    // console.log("Cell is not empty");
     return [isValid, newBoardProps];
   }
 
@@ -59,20 +93,19 @@ export const processCells = (boardProps: BoardPropsType, row: number, col: numbe
     let c = col + dx;
     let foundEnermy = false;
     let rev_cache: Coordinate[] = [];
-    while (0 <= r && r < cells.length && 0 <= c && c < cells[0].length) {
-      console.log(`1 search${dy},${dx}:${r},${c}: ${cells[r][c]} === ${player}`);
-      if (cells[r][c] === 0) {
-        console.log(`   found0 ${cells[r][c]}: ${r},${c}`);
+    while (0 <= r && r < map.length && 0 <= c && c < map[0].length) {
+      // console.log(`1 search${dy},${dx}:${r},${c}: ${map[r][c]} === ${player}`);
+      if (map[r][c] === 0) {
+        // console.log(`   found0 ${map[r][c]}: ${r},${c}`);
         break;
-      } else if (cells[r][c] === -player) {
+      } else if (map[r][c] === -player) {
         // 敵
         foundEnermy = true;
-        rev_cache=[...rev_cache,[r, c]];
-        console.log(`     foundEnermy ${cells[r][c]}: ${r},${c}, rev_cache: `);
-        // console.table(rev_cache);
-      } else if (cells[r][c] === player) {
+        rev_cache = [...rev_cache, [r, c]];
+        // console.log(`     foundEnermy ${map[r][c]}: ${r},${c}, rev_cache: `);
+      } else if (map[r][c] === player) {
         // 味方
-        console.log(`   foun味方 ${cells[r][c]}: ${r},${c}, rev_cache: `);
+        // console.log(`   foun味方 ${map[r][c]}: ${r},${c}, rev_cache: `);
         if (foundEnermy) {
           // いきなり味方ではない
           isValid = true;
@@ -80,19 +113,20 @@ export const processCells = (boardProps: BoardPropsType, row: number, col: numbe
             // 短絡表羽化的にreturnする。変更しない
             return [isValid, newBoardProps];
           } else {
-            newBoardProps.cells[row][col] = player;// 置いた石
+            console.table(rev_cache);
+            newBoardProps.map[row][col] = player;// 置いた石
             rev_cache.forEach(([r, c]) => {
-              newBoardProps.cells[r][c] = player;
-              newBoardProps.flags[r][c] = -1;
-              console.log(`     rev: ${c} , ${r} = ${player}`);
-              console.log(newBoardProps.cells[r][c]==1 ? "●" : "○");
+              newBoardProps.map[r][c] = player;
+              newBoardProps.flags[r][c] = CellFlag.Changed;
+              // console.log(`     rev: ${c} , ${r} = ${player}`);
+              // console.log(newBoardProps.map[r][c]==1 ? "●" : "○");
             });
             newBoardProps.player = -player as CellValue;
           }
         } else {
-          console.log("  4 いきなり味方");
+          // console.log("  4 いきなり味方");
+          break;
         }
-        break;
       }
 
       r += dy;
@@ -100,7 +134,21 @@ export const processCells = (boardProps: BoardPropsType, row: number, col: numbe
     }
     rev_cache = [];
   });
-  return [isValid,newBoardProps];
-}
-export type { CellMatrix, CellValue };
+  return [isValid, newBoardProps];
+};
+
+export const markPlaceableCells = (boardProps: BoardPropsType) => {
+  const flags = boardProps.flags;
+  boardProps.map.forEach((row, rowIndex) => {
+    row.forEach((cell, colIndex) => {
+      if (boardProps.map[rowIndex][colIndex] === 0) {
+        const [isPlaceable, _] = placeAndReverse(boardProps, rowIndex, colIndex, true);
+        if (isPlaceable) {
+          flags[rowIndex][colIndex]=CellFlag.Placeable;
+        }
+      }
+    });
+  });
+};
+export type { CellFlagMatrix, CellMatrix, CellValue };
 export default OtheloLogic;
