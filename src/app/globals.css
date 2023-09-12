@@ -26,6 +26,20 @@ body {
     rgb(var(--background-start-rgb));
 }
 
+.cells_border{
+  display: inline-block;
+  vertical-align:top;
+  height: 640px;
+  width: 640px;
+}
+
+.text{
+  display: inline-block;
+  vertical-align:top;
+  height: 640px;
+  width: 60px;
+}
+
 .cell{
   display: inline-block;
   vertical-align:top;

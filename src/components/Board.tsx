@@ -84,7 +84,7 @@ const Board = () => {
             </div>
         ))}
       </div>
-      <div className='text'>{ LogProps.text }</div>
+      <div className='text'>Msg:{ LogProps.text }</div>
     </div>
   );
 };
