@@ -22,10 +22,10 @@ const getStonetyle = (value: CellValue): string => {
 const Cell = ({ row,col,cellValue,cellFlag,onClick}:CellProps ) => {
     return (
         <div
-        className={cellFlag===0 ? "cell" :`cell ${cellFlag}`}
+        className={cellFlag}
         onClick={() => onClick(row, col)}
         >
-            <div className={getStonetyle(cellValue)}>{cellFlag===0 ? "" :` ${cellFlag}`}</div>
+            <div className={getStonetyle(cellValue)}>{cellFlag}</div>
         </div>
     );
 }
