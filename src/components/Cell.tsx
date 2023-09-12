@@ -11,9 +11,9 @@ type CellProps = {
 const getStonetyle = (value: CellValue): string => {
     switch (value) {
         case -1:
-            return 'stone white'; // Black stone
+            return 'white stone'; // Black stone
         case 1:
-            return 'stone black'; // White stone
+            return 'black stone'; // White stone
         default:
             return 'stone'; // Empty cell
     }
@@ -22,10 +22,10 @@ const getStonetyle = (value: CellValue): string => {
 const Cell = ({ row,col,cellValue,cellFlag,onClick}:CellProps ) => {
     return (
         <div
-        className={"cell "+ (cellFlag === CellFlag.Changed ?  "changed "  : "") + (cellFlag === CellFlag.Placeable ?  "placeable"  : "")}
+        className={cellFlag===0 ? "cell" :`cell ${cellFlag}`}
         onClick={() => onClick(row, col)}
         >
-            <div className={getStonetyle(cellValue)} ></div>
+            <div className={getStonetyle(cellValue)}>{cellFlag===0 ? "" :` ${cellFlag}`}</div>
         </div>
     );
 }

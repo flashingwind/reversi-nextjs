@@ -63,12 +63,13 @@ body {
   border-radius: 50%;
   margin: 0px;
   color: black;
-  font-size: 50px;
+  font-size: 9pt;
   text-align: center;
   vertical-align: middle;
 }
 .stone.black {
   background-color: black;
+  color: white;
 }
 
 .stone.white {
@@ -76,10 +77,14 @@ body {
   border:1px solid black;
 }
 
-.placeable{
+.cell.Placeable{
   background: gray;
 }
 
-.changed{
+.cell.Placed{
+  background: green;
+}
+
+.cell.Changed{
   background: lightgrey;
 }

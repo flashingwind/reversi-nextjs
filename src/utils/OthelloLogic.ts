@@ -7,72 +7,13 @@ type CellValue = -1 | 0 | 1; // Define CellValue type here
 type CellMatrix = CellValue[][];
 type ScoredCellMatrix = number[][];
 export enum CellFlag {
-  None,
-  Changed,
-  Placeable,
-  Placed,
+  None= "",
+  Changed= "Changed",
+  Placeable="Placeable",
+  Placed="Placed",
 }
 
 type CellFlagMatrix = CellFlag[][];
-
-const OtheloLogic = ()=> {
-  return ;
-}
-
-const directions: Direction[] = [
-  [-1, -1], [-1, 0], [-1, 1],
-  [0, -1],           [0, 1],
-  [1, -1],  [1, 0],  [1, 1]
-];
-export const initialMap = (): CellMatrix => {
-  const initialMap: CellMatrix = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, -1, 1, 0, 0, 0],
-    [0, 0, 0, 1, -1, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-  ];
-  return initialMap;
-};
-export const zeroMap = (): CellMatrix => {
-  const zeroMap: CellMatrix = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-  ];
-  return zeroMap;
-};
-export const noneFlags = (): CellFlagMatrix  => {
-  const zeros:CellFlagMatrix = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-  ];
-  return zeros;
-};
-const scoredMap: ScoredCellMatrix = [
-  [45, -11, 4, -1, -1, 4, -11, 45],
-  [-11, -16, -1, -3, -3, 2, -16, -11],
-  [4, -1, 2, -1, -1, 2, -1, 4],
-  [-1, -3, -1, 0, 0, -1, -3, -1],
-  [-1, -3, -1, 0, 0, -1, -3, -1],
-  [4, -1, 2, -1, -1, 2, -1, 4],
-  [-11, -16, -1, -3, -3, -1, -16, -11],
-  [45, -11, 4, -1, -1, 4, -11, 45],
-];
 
 export const copyCellMatrix = (matrix: CellMatrix) => {
   const map2: CellMatrix = [];
@@ -90,32 +31,37 @@ export const copyBoardProps = (boardProps: BoardPropsType): BoardPropsType => {
   return newBoardProps;
 };
 
-export const place = (boardProps: BoardPropsType, row: number, col: number): [boolean,BoardPropsType] => {
-  const newBoardProps = copyBoardProps(boardProps);
-  const [isValid, toBeRev] = searchReversibleCells(boardProps, row, col);
+export const place = (newBoardProps: BoardPropsType, row: number, col: number): boolean => {
+  const [isValid, toBeRev] = searchReversibleCells(newBoardProps, row, col);
   if (isValid) {
-    newBoardProps.map[row][col] = boardProps.player;
+    newBoardProps.map[row][col] = newBoardProps.player;
+    newBoardProps.flags[row][col] = CellFlag.Placed;
     toBeRev.forEach(([r, c]) => {
-      newBoardProps.map[r][c] = boardProps.player;
+      newBoardProps.map[r][c] = newBoardProps.player;
       newBoardProps.flags[r][c] = CellFlag.Changed;
     });
-    newBoardProps.player = -boardProps.player as CellValue;
+    newBoardProps.player = -newBoardProps.player as CellValue;
   }
-  return [isValid,newBoardProps];
+  return isValid;
 }
 
-export const placeAutomatically = (boardProps: BoardPropsType):[boolean,BoardPropsType] => {
+export const placeAutomatically = (newBoardProps: BoardPropsType):boolean => {
   let maxScore = 0;
   let maxScoreCell:number[] = [];
-  const scores = searchPlaceableCellsAndCalcScore(boardProps);
+  const scores = searchPlaceableCellsAndCalcScore(newBoardProps);
   if (scores.length != 0) {
     scores.sort((a, b) => b[2] - a[2]);
     const [row, col, s] = scores[0];
-    const [isValid, newBoardProps] = place(boardProps, row, col);
-    console.log(`auto: ${row}, ${col}, ${s}: ${isValid}`);
-    return [isValid, newBoardProps];
+    const isPlaced = place(newBoardProps, row, col);
+    // console.log(`auto: ${row}, ${col}, ${s}: ${isPlaced}`);
+    if (!isPlaced) {
+      console.log("○: Auto: Err: 不適切な座標指定。place()失敗");
+    }
+    return isPlaced;
   } else {
-    return [false, boardProps];
+    console.log("○: Auto: 置ける場所がみつからない: skip");
+    newBoardProps.player = -newBoardProps.player as CellValue;
+    return false;
   }
 };
 
@@ -196,5 +142,65 @@ export const markPlaceableCells = (boardProps: BoardPropsType) => {
     });
   });
 };
+
+const OtheloLogic = ()=> {
+  return ;
+}
+
+const directions: Direction[] = [
+  [-1, -1], [-1, 0], [-1, 1],
+  [0, -1],           [0, 1],
+  [1, -1],  [1, 0],  [1, 1]
+];
+export const initialMap = (): CellMatrix => {
+  const initialMap: CellMatrix = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, -1, 1, 0, 0, 0],
+    [0, 0, 0, 1, -1, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+  ];
+  return initialMap;
+};
+export const zeroMap = (): CellMatrix => {
+  const zeroMap: CellMatrix = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+  ];
+  return zeroMap;
+};
+export const noneFlags = (): CellFlagMatrix  => {
+  const zeros:CellFlagMatrix = [
+    [CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None],
+    [CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None],
+    [CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None],
+    [CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None],
+    [CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None],
+    [CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None],
+    [CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None],
+    [CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None, CellFlag.None],
+  ];
+  return zeros;
+};
+const scoredMap: ScoredCellMatrix = [
+  [45, -11, 4, -1, -1, 4, -11, 45],
+  [-11, -16, -1, -3, -3, 2, -16, -11],
+  [4, -1, 2, -1, -1, 2, -1, 4],
+  [-1, -3, -1, 0, 0, -1, -3, -1],
+  [-1, -3, -1, 0, 0, -1, -3, -1],
+  [4, -1, 2, -1, -1, 2, -1, 4],
+  [-11, -16, -1, -3, -3, -1, -16, -11],
+  [45, -11, 4, -1, -1, 4, -11, 45],
+];
+
 export type { CellFlagMatrix, CellMatrix, CellValue };
 export default OtheloLogic;
