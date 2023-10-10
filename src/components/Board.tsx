@@ -24,7 +24,7 @@ const Board = () => {
     text: [],
   });
   const onFullAutoButtonClick = (): void => {
-    let intervalId = setInterval(genRandomClick, 100)
+    let intervalId = setInterval(genRandomClick, 10)
     // setTimeout(() => clearInterval(intervalId), 5000)
    }
    const genRandomClick = (): void => {
