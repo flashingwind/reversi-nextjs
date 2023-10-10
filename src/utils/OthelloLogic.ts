@@ -27,6 +27,7 @@ export const copyBoardProps = (boardProps: BoardPropsType): BoardPropsType => {
     map: copyCellMatrix(boardProps.map),
     flags:  noneFlags(),
     player: boardProps.player,
+    revCnt: boardProps.revCnt,
   };
   return newBoardProps;
 };
@@ -36,6 +37,8 @@ export const place = (newBoardProps: BoardPropsType, row: number, col: number): 
   if (isValid) {
     newBoardProps.map[row][col] = newBoardProps.player;
     newBoardProps.flags[row][col] = CellFlag.Placed;
+    newBoardProps.revCnt += 1;
+    console.log("REVCNT: "+ newBoardProps.player + ", " + toBeRev.length);
     toBeRev.forEach(([r, c]) => {
       newBoardProps.map[r][c] = newBoardProps.player;
       newBoardProps.flags[r][c] = CellFlag.Changed;

@@ -6,24 +6,34 @@ export interface BoardPropsType {
   player: CellValue;
   map: CellMatrix;
   flags: CellFlagMatrix;
+  revCnt: number;
 }
 export interface LogPropsType {
   text: string[];
 }
+
 const Board = () => {
   const [BoardProps, setBoardProps] = useState<BoardPropsType>({
     // 先手(黒)・後手(白)
     player: 1 as CellValue,
     map: initialMap(),
     flags: noneFlags(),
+    revCnt: 0
   });
   const [LogProps, setLogProps] = useState<LogPropsType>({
     text: [],
   });
-
+  const onFullAutoButtonClick = (): void => {
+    let intervalId = setInterval(genRandomClick, 100)
+    // setTimeout(() => clearInterval(intervalId), 5000)
+   }
+   const genRandomClick = (): void => {
+      onCellClick(Math.floor(Math.random() * 8), Math.floor(Math.random() * 8));
+   }
   const onCellClick = (row: number, col: number):void => {
     // Update the map with the new move
     let logMsg = "";
+    let is_both_skiped = false;
     setBoardProps((boardProps: BoardPropsType) => {
       let scores = searchPlaceableCellsAndCalcScore(boardProps);
       let newBoardProps = copyBoardProps(boardProps);
@@ -35,6 +45,7 @@ const Board = () => {
           if (placeAutomatically(newBoardProps)) {
             console.log("○: Auto: OK");
           } else {
+            is_both_skiped = true;
             logMsg += "○: Auto: : skip";
             console.log("○: Auto: skip");
           }
@@ -50,6 +61,9 @@ const Board = () => {
           newBoardProps.flags[r][c] = CellFlag.Placeable;
         });
         if (scores.length != 0) {
+          if (is_both_skiped) {
+            break;
+          }
           return newBoardProps;
         }
         newBoardProps = copyBoardProps(boardProps);
@@ -57,6 +71,7 @@ const Board = () => {
       return newBoardProps;
     });
 };
+  // onCellClick(Math.floor( Math.random() * 8 ),Math.floor( Math.random() * 8 ));
 
   const getScoreString = ((BoardProps: BoardPropsType): string => {
     let white = 0;
@@ -74,7 +89,8 @@ const Board = () => {
   });
   return (
     <div className="board">
-      <div className='score'>Current Player: {getStonetyle(BoardProps.player)} {getScoreString(BoardProps)}</div>
+      <div className='score'>Current Player: {getStonetyle(BoardProps.player)} {getScoreString(BoardProps)} Revese count: {BoardProps.revCnt}</div>
+      <div className='auto'><a href='#' onClick={onFullAutoButtonClick} >Full auto</a></div>
         <div className='cells_border'>
         {BoardProps.map.map((row: CellValue[], rowIndex: number) => (
           <div key={rowIndex} className="row">
