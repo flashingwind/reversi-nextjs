@@ -8,7 +8,7 @@ type CellMatrix = CellValue[][];
 type ScoredCellMatrix = number[][];
 export enum CellFlag {
   None= "",
-  Changed= "Changed",
+  Reversed= "Reversed",
   Placeable="Placeable",
   Placed="Placed",
 }
@@ -41,7 +41,7 @@ export const place = (newBoardProps: BoardPropsType, row: number, col: number): 
     console.log("REVCNT: "+ newBoardProps.player + ", " + toBeRev.length);
     toBeRev.forEach(([r, c]) => {
       newBoardProps.map[r][c] = newBoardProps.player;
-      newBoardProps.flags[r][c] = CellFlag.Changed;
+      newBoardProps.flags[r][c] = CellFlag.Reversed;
     });
     newBoardProps.player = -newBoardProps.player as CellValue;
   }
