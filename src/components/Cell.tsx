@@ -25,7 +25,10 @@ const Cell = ({ row,col,cellValue,cellFlag,onClick}:CellProps ) => {
         className={"cell "+cellFlag}
         onClick={() => onClick(row, col)}
         >
-            <div className={getStonetyle(cellValue)}>{cellFlag.toString()=='white stone' && '×'}</div>
+            <div className={getStonetyle(cellValue)}>{cellFlag ?
+                cellFlag
+                : (getStonetyle(cellValue)=='white stone' && '×')
+            }</div>
         </div>
     );
 }
