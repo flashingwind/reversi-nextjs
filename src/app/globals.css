@@ -56,7 +56,7 @@ body {
 }
 
 .cell:hover{
-  background-color: red;
+  background-color: #ffe57a;
 }
 
 .row{
@@ -82,13 +82,13 @@ body {
   vertical-align: middle;
 }
 .stone.black {
-  background-color: black;
+  background-color: #ef8304;
   color: white;
 }
 
 .stone.white {
   background-color: white;
-  border:1px solid black;
+  border:1px solid #ffe57a;
 }
 
 .cell.Placeable{
